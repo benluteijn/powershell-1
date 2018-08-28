@@ -72,7 +72,7 @@ function Start-CompareVDIs {
 
     If (!($Global:DefaultHVServers)) {
         Write-Verbose "[$(Get-Date)] Could not connect to $hvserver aborting"
-        Exit
+        break
     }
 
     Write-Verbose "[$(Get-Date)] Extracting all VDI's from VMWare Horizon View"
@@ -81,7 +81,7 @@ function Start-CompareVDIs {
 
     If ($vdidesktops -eq $null) {
         Write-Verbose "[$(Get-Date)] Cannot get VDI's from $hvserver aborting"
-        Exit    
+        break
     }
 
     #compare
