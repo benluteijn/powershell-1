@@ -26,17 +26,18 @@ Function Show-AzureBackups {
         $Days
     )
 
-    $hashazure = Import-Clixml -Path "D:\Scripts\Creds\azurereadonlya.cred"
+    $hashazure = Import-Clixml `
+        -Path "D:\Scripts\Creds\azurereadonlya.cred"
+
+    #load static variables using json file
+    $config = Get-Content `
+        -Path "D:\Scripts\Modules\Config.json" `
+        -Raw | ConvertFrom-Json
 
     #connect to azure
     Write-Verbose "[$(Get-Date)] Connecting to Azure"
     Connect-AzureRmAccount `
         -Credential $hashazure.AzureReadonlya >$null
-
-    #set dynamic variables
-    Set-Variable `
-        -Name file `
-        -Value "D:\Scripts\ShowAzureBackups\Output\azure-backups-$((Get-Date).ToString('MM-dd-yyyy')).log"
 
     Write-Verbose "[$(Get-Date)] Extracting all subscriptions"
     $list = Get-AzureRmSubscription |Select-Object `
