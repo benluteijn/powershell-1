@@ -33,10 +33,13 @@ function Show-AzureInventory {
         [switch] $ShowAllVMs
     )
 
-    #connect to azure
+    #validate azure session
     Write-Verbose "[$(Get-Date)] Connecting to Azure"
-    Connect-AzureRmAccount `
-        -Credential $hash.AzureReadonly >$null
+    $session = Get-AzureRmContext
+    if ($session.Account -eq $null) {
+        Write-Verbose "Not connected to Azure. Take care of it in your user profile"
+        break
+    }
 
     #get subscriptions
     if ($ShowSubscriptions) {
