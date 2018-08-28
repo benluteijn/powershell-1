@@ -68,6 +68,6 @@ Function Show-AzureBackups {
     }
 
     $backupstatus = $bstatus | Out-String
-    Write-Verbose $backupstatus
+    Write-Verbose $backupstatuss
 
 }
