@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Counts available VDI's per desktop pool
+Counts available VDI's per desktop pools
 
 .DESCRIPTION
 This function counts the available VDI's per desktop pool.
