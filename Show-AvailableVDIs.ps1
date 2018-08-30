@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Counts available VDI's per desktop pool
+Counts available VDI's per desktop pools
 
 .DESCRIPTION
 This function counts the available VDI's per desktop pool.
@@ -129,7 +129,7 @@ function Show-AvailableVDIs {
     }
 
     #write output
-    Write-Verbose "[$(Get-Date)] Generating output available VDI's per pool"
+    Write-Verbose "[$(Get-Date)] Generating output available VDI's per pools"
     Write-Verbose "[$(Get-Date)] DCA-SUP pool available VDI's: $($availablevdi.nlsupa |Out-String -stream)"
     Write-Verbose "[$(Get-Date)] DCB-SUP pool available VDI's: $($availablevdi.nlsupb |Out-String -stream)"
     Write-Verbose "[$(Get-Date)] DCA-REM pool available VDI's: $($availablevdi.nlrema |Out-String -Stream)"
