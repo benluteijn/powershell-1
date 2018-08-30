@@ -29,11 +29,6 @@ function Start-CompareVDIs {
     [CmdletBinding()]
     param()
 
-    #set dynamic variables
-    Set-Variable `
-        -Name file `
-        -Value "D:\Scripts\StartCompareVDIs\Output\vmware-compare-vdi-$((Get-Date).ToString('MM-dd-yyyy')).log"
-
     $hashvm = Import-Clixml -Path "D:\Scripts\Creds\nlsvcvmwa.cred"
 
     #load static variables using json file
