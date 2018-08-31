@@ -33,17 +33,13 @@ function Start-IntegrityCheckADGroups {
     [CmdletBinding()]
     param()
 
-    #set dynamic variables
-    Set-Variable `
-        -Name file `
-        -Value "D:\Scripts\Start-IntegrityCheckADGroups\Output\ad-creategroups-$((Get-Date).ToString('MM-dd-yyyy')).log"
-
-    $hashadcheck = Import-Clixml -Path "D:\Scripts\Creds\nlsvcintegritych.cred"
-
     #load static variables using json file
     $config = Get-Content `
         -Path "D:\Scripts\Modules\Config.json" `
         -Raw | ConvertFrom-Json
+
+    $hashadcheck = Import-Clixml `
+        -Path "D:\Scripts\Creds\nlsvcintegritych.cred"
 
     #load modules
     If (Get-Module ActiveDirectory) {
@@ -58,22 +54,29 @@ function Start-IntegrityCheckADGroups {
     Write-Verbose "[$(Get-Date)] Creating exception list"
     $domaincontrollers = $config.domaincontrollers
 
-    $Servers = Get-ADComputer -Filter {OperatingSystem -Like "Windows Server*"} -Properties * |select-Object * -expandproperty name
-    $failover = $servers | Where-Object {$_.description -like "*failover*"} | Select-Object `
+    $Servers = Get-ADComputer `
+        -Filter {OperatingSystem -Like "Windows Server*"} `
+        -Properties * |select-Object * `
+        -expandproperty name
+
+    $failover = $servers | Where-Object {
+        $_.description -like "*failover*"} | Select-Object `
         -ExpandProperty Name
 
     $exception = $domaincontrollers + $failover
 
     #create list of servers and security groups
     Write-Verbose  "[$(Get-Date)] Extracting existing LAM groups from active directory"
-    $ExistingLamGroups = Get-ADGroup -filter * | Where-Object {
-        $_.Name -like $config.ADGroupPrefixLamWildcard} | Select-Object `
-        -ExpandProperty Name
+    $ExistingLamGroups = Get-ADGroup `
+        -filter * | Where-Object {
+            $_.Name -like $config.ADGroupPrefixLamWildcard} | Select-Object `
+                -ExpandProperty Name
 
     Write-Verbose  "[$(Get-Date)] Extracting existing RDP groups from active directory"
-    $ExistingRdpGroups = Get-ADGroup -filter * | Where-Object {
-        $_.Name -like $config.ADGroupPrefixRdpWildcard} | Select-Object `
-        -ExpandProperty Name
+    $ExistingRdpGroups = Get-ADGroup `
+        -filter * | Where-Object {
+            $_.Name -like $config.ADGroupPrefixRdpWildcard} | Select-Object `
+                -ExpandProperty Name
 
     $ExistingLamGroup = foreach ($line in $ExistingLamGroups) {
         $line -replace $config.ADGroupPrefixLam, ""
@@ -84,7 +87,8 @@ function Start-IntegrityCheckADGroups {
     }
 
     Write-Verbose "[$(Get-Date)] Extracting server list from active directory"
-    $servernames = Get-ADComputer -Filter {OperatingSystem -Like "Windows Server*"} `
+    $servernames = Get-ADComputer `
+        -Filter {OperatingSystem -Like "Windows Server*"} `
         -Properties * |select-Object * `
         -expandproperty Name
 
@@ -176,7 +180,6 @@ function Start-IntegrityCheckADGroups {
     else {
         Write-Verbose "[$(Get-Date)] All RDP groups have corresponding AD objects"
     }
-
     
     #enforce empty or wrong descriptions LAM groups
     $emptydescrlam = Get-ADGroup `
