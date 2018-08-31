@@ -178,15 +178,19 @@ function Start-IntegrityCheckADGroups {
     }
 
     
-    #enforce descriptions LAM groups
+    #enforce empty or wrong descriptions LAM groups
     $emptydescrlam = Get-ADGroup `
         -Filter * -Properties * `
-        -SearchBase $config.adou_lam | Where-Object {$_.name -like "NL-SG ADM-*" -and $_.description -eq $null} | Select-Object  `
-        -ExpandProperty Name
+        -SearchBase $config.adou_lam | Where-Object {
+        $_.name -like $config.adgroupprefixlamwildcard `
+            -and $_.description -eq $null `
+            -or $_.description -notlike $config.adgroupdescrlam} | Select-Object `
+                -ExpandProperty Name
       
     Write-Verbose "[$(Get-Date)] Enforcing descriptions LAM security groups"
     foreach ($entry in $emptydescrlam) {
-        $descrnamelam = $entry -replace 'NL-SG ADM-', ''
+        $descrnamelam = $entry `
+            -replace $config.adgroupprefixlam, ''
         Set-ADGroup `
             -Identity "$entry" `
             -Description "Local Admin group to server $descrnamelam" `
@@ -194,15 +198,19 @@ function Start-IntegrityCheckADGroups {
         Write-Verbose "[$(Get-Date)] Enforing description for group $entry"
     }
 
-    #enforce descriptions RDP groups
+    #enforce empty or wrong descriptions RDP groups
     $emptydescrrdp = Get-ADGroup `
         -Filter * -Properties * `
-        -SearchBase $config.adou_rdp | Where-Object {$_.name -like "NL-SG RDP-*" -and $_.description -eq $null} | Select-Object `
-        -Expandproperty Name
+        -SearchBase $config.adou_rdp | Where-Object {
+        $_.name -like $config.adgroupprefixrdpwildcard `
+            -and $_.description -eq $null `
+            -or $_.description -notlike $config.adgroupdescrrdp} | Select-Object `
+                -Expandproperty Name
 
     Write-Verbose "[$(Get-Date)] Enforcing descriptions RDP security groups"
     foreach ($line in $emptydescrrdp) {
-        $descrnamerdp = $line -replace 'NL-SG RDP-', ''
+        $descrnamerdp = $line `
+            -replace $config.adgroupprefixrdp, ''
         Set-ADGroup `
             -Identity "$line" `
             -Description "Local RDP group to server $descrnamerdp" `
