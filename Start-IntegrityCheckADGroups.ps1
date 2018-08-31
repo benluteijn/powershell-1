@@ -177,27 +177,37 @@ function Start-IntegrityCheckADGroups {
         Write-Verbose "[$(Get-Date)] All RDP groups have corresponding AD objects"
     }
 
-    #  #enforce descriptions LAM groups
-    #  Write-Verbose "[$(Get-Date)] Enforcing description LAM security groups"
-    #  foreach ($entry in $ExistingLamGroup) {
-    #      Set-ADGroup `
-    #          -Identity "$ADGroupPrefixLam$entry" `
-    #          -Credential $hash.domainadmin `
-    #          -Description "Local Admin group to server $entry" `
-    #          -GroupScope "Universal"
-    #  }
+    
+    #enforce descriptions LAM groups
+    $emptydescrlam = Get-ADGroup `
+        -Filter * -Properties * `
+        -SearchBase $config.adou_lam | Where-Object {$_.name -like "NL-SG ADM-*" -and $_.description -eq $null} | Select-Object  `
+        -ExpandProperty Name
+      
+    Write-Verbose "[$(Get-Date)] Enforcing descriptions LAM security groups"
+    foreach ($entry in $emptydescrlam) {
+        $descrnamelam = $entry -replace 'NL-SG ADM-', ''
+        Set-ADGroup `
+            -Identity "$entry" `
+            -Description "Local Admin group to server $descrnamelam" `
+            -GroupScope "Universal"
+        Write-Verbose "[$(Get-Date)] Enforing description for group $entry"
+    }
 
-    #  #enforce descriptions RDP groups
-    #  Write-Verbose "[$(Get-Date)] Enforcing description RDP security groups"
-    #  foreach ($entry in $ExistingRdpGroup) {
-    #      Set-ADGroup `
-    #          -Identity "$ADGroupPrefixRdp$entry" `
-    #          -Credential $hash.domainadmin `
-    #          -Description "Local RDP group to server $entry" `
-    #          -GroupScope "Universal"
-    #  }
+    #enforce descriptions RDP groups
+    $emptydescrrdp = Get-ADGroup `
+        -Filter * -Properties * `
+        -SearchBase $config.adou_rdp | Where-Object {$_.name -like "NL-SG RDP-*" -and $_.description -eq $null} | Select-Object `
+        -Expandproperty Name
+
+    Write-Verbose "[$(Get-Date)] Enforcing descriptions RDP security groups"
+    foreach ($line in $emptydescrrdp) {
+        $descrnamerdp = $line -replace 'NL-SG RDP-', ''
+        Set-ADGroup `
+            -Identity "$line" `
+            -Description "Local RDP group to server $descrnamerdp" `
+            -GroupScope "Universal"
+        Write-Verbose "[$(Get-Date)] Enforcing description for group $line"
+    }
 
 }
-
-
-
