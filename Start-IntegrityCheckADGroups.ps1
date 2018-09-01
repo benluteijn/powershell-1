@@ -218,7 +218,7 @@ function Start-IntegrityCheckADGroups {
             -Identity "$line" `
             -Description "Local RDP group to server $descrnamerdp" `
             -GroupScope "Universal"
-        Write-Verbose "[$(Get-Date)] Enforcing description for group $line" test
+        Write-Verbose "[$(Get-Date)] Enforcing description for group $line"
     }
 
 }
