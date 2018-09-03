@@ -26,14 +26,10 @@ function Show-IntegrityCheckGetADMembers {
     [CmdletBinding()]
     param()
 
-    #set dynamic variables
-    Set-Variable `
-        -Name file `
-        -Value "D:\Scripts\GetADMembers\Output\ad-memberships-$((Get-Date).ToString('MM-dd-yyyy')).log"
-
     #load static variables using json file
+    Write-Verbose "[$(Get-Date)] Loading data from JSON"
     $config = Get-Content `
-        -Path "D:\Scripts\Modules\Config.json" `
+        -Path $configfile `
         -Raw | ConvertFrom-Json
 
     #load modules

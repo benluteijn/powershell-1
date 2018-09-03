@@ -32,8 +32,9 @@ function Start-CompareVDIs {
     $hashvm = Import-Clixml -Path "D:\Scripts\Creds\nlsvcvmwa.cred"
 
     #load static variables using json file
+    Write-Verbose "[$(Get-Date)] Loading data from JSON"
     $config = Get-Content `
-        -Path "D:\Scripts\Modules\Config.json" `
+        -Path $configfile `
         -Raw | ConvertFrom-Json
 
     #load module

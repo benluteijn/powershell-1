@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Counts available VDI's per desktop pools
+Counts available VDI's per desktop pool
 
 .DESCRIPTION
 This function counts the available VDI's per desktop pool.
@@ -33,14 +33,10 @@ function Show-AvailableVDIs {
     [CmdletBinding()]
     param()
 
-    #set dynamic variables
-    Set-Variable `
-        -Name file `
-        -Value "D:\Scripts\ShowAvailableVDIs\Output\vmware-available-vdi-$((Get-Date).ToString('MM-dd-yyyy')).log"
-
     #load static variables using json file
+    Write-Verbose "[$(Get-Date)] Loading data from JSON"
     $config = Get-Content `
-        -Path "D:\Scripts\Modules\Config.json" `
+        -Path $configfile `
         -Raw | ConvertFrom-Json
 
     $hashvm = Import-Clixml -Path "D:\Scripts\Creds\nlsvcvmwa.cred"
@@ -129,7 +125,7 @@ function Show-AvailableVDIs {
     }
 
     #write output
-    Write-Verbose "[$(Get-Date)] Generating output available VDI's per pools"
+    Write-Verbose "[$(Get-Date)] Generating output available VDI's per pool"
     Write-Verbose "[$(Get-Date)] DCA-SUP pool available VDI's: $($availablevdi.nlsupa |Out-String -stream)"
     Write-Verbose "[$(Get-Date)] DCB-SUP pool available VDI's: $($availablevdi.nlsupb |Out-String -stream)"
     Write-Verbose "[$(Get-Date)] DCA-REM pool available VDI's: $($availablevdi.nlrema |Out-String -Stream)"

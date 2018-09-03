@@ -34,13 +34,14 @@ function Start-IntegrityCheckADGroups {
     param()
 
     #load static variables using json file
+    Write-Verbose "[$(Get-Date)] Loading data from JSON"
     $config = Get-Content `
-        -Path "D:\Scripts\Modules\Config.json" `
+        -Path $configfile `
         -Raw | ConvertFrom-Json
 
     $hashadcheck = Import-Clixml `
         -Path "D:\Scripts\Creds\nlsvcintegritych.cred"
-
+ 
     #load modules
     If (Get-Module ActiveDirectory) {
         Write-Verbose "[$(Get-Date)] Active directory module already available"

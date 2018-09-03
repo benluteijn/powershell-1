@@ -25,10 +25,10 @@ function Show-DfsShares {
     [CmdletBinding()]
     param()
  
-    #get dfs folder paths through json
-    Write-Verbose "[$(Get-Date)] Reading static variables from JSON file"
+    #load static variables using json file
+    Write-Verbose "[$(Get-Date)] Loading data from JSON"
     $config = Get-Content `
-        -Path "D:\Scripts\Modules\Config.json" `
+        -Path $configfile `
         -Raw | ConvertFrom-Json
 
     #extracting shares
