@@ -18,13 +18,6 @@ Last review date:       01-05-2018
 
 .NOTES
 19-04-2018:             Initial release
-01-05-2018:             Changed name property to Name
-07-05-2018:             Added NL-SG RDP groups
-11-05-2018:             Cleanup groups with no existing AD object
-11-05-2018:             Enforce empty descriptions on objects
-22-05-2018:             Changed groupscope to universal
-18-06-2018:             Added verbose parameter
-06-07-2018:             Added timestamp to verbose logging
 #>
 
 
@@ -34,14 +27,28 @@ function Start-IntegrityCheckADGroups {
     param()
 
     #load static variables using json file
-    Write-Verbose "[$(Get-Date)] Loading data from JSON"
-    $config = Get-Content `
-        -Path $configfile `
-        -Raw | ConvertFrom-Json
+    if (!($configfile)) {
+        Write-Verbose "[$(Get-Date)] Variable configfile not set properly"
+        break
+    }
+        
+    else {
+        $config = Get-Content `
+            -Path $configfile `
+            -Raw | ConvertFrom-Json
+    }
+    
+    if ($env:UserName -eq $config.nlsvcintegritych) {
+        Write-Verbose "[$(Get-Date)] Loading credentials"
+        $hashadcheck = Import-Clixml `
+            -Path "D:\Scripts\Creds\nlsvcintegritych.cred"
+    }
+        
+    else {
+        Write-Verbose "[$(Get-Date)] Run this script as a different user"
+        break
+    }
 
-    $hashadcheck = Import-Clixml `
-        -Path "D:\Scripts\Creds\nlsvcintegritych.cred"
- 
     #load modules
     If (Get-Module ActiveDirectory) {
         Write-Verbose "[$(Get-Date)] Active directory module already available"
@@ -70,14 +77,14 @@ function Start-IntegrityCheckADGroups {
     Write-Verbose  "[$(Get-Date)] Extracting existing LAM groups from active directory"
     $ExistingLamGroups = Get-ADGroup `
         -filter * | Where-Object {
-            $_.Name -like $config.ADGroupPrefixLamWildcard} | Select-Object `
-                -ExpandProperty Name
+        $_.Name -like $config.ADGroupPrefixLamWildcard} | Select-Object `
+        -ExpandProperty Name
 
     Write-Verbose  "[$(Get-Date)] Extracting existing RDP groups from active directory"
     $ExistingRdpGroups = Get-ADGroup `
         -filter * | Where-Object {
-            $_.Name -like $config.ADGroupPrefixRdpWildcard} | Select-Object `
-                -ExpandProperty Name
+        $_.Name -like $config.ADGroupPrefixRdpWildcard} | Select-Object `
+        -ExpandProperty Name
 
     $ExistingLamGroup = foreach ($line in $ExistingLamGroups) {
         $line -replace $config.ADGroupPrefixLam, ""
@@ -189,7 +196,7 @@ function Start-IntegrityCheckADGroups {
         $_.name -like $config.adgroupprefixlamwildcard `
             -and $_.description -eq $null `
             -or $_.description -notlike $config.adgroupdescrlam} | Select-Object `
-                -ExpandProperty Name
+        -ExpandProperty Name
       
     Write-Verbose "[$(Get-Date)] Enforcing descriptions LAM security groups"
     foreach ($entry in $emptydescrlam) {
@@ -209,7 +216,7 @@ function Start-IntegrityCheckADGroups {
         $_.name -like $config.adgroupprefixrdpwildcard `
             -and $_.description -eq $null `
             -or $_.description -notlike $config.adgroupdescrrdp} | Select-Object `
-                -Expandproperty Name
+        -Expandproperty Name
 
     Write-Verbose "[$(Get-Date)] Enforcing descriptions RDP security groups"
     foreach ($line in $emptydescrrdp) {
