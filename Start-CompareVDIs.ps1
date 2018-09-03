@@ -13,13 +13,6 @@ Function name:          Start-CompareVDIs
 Author:                 Dennis Kool 
 DateCreated:            11-06-2018
 DateModified:           02-08-2018
-
-.NOTES
-11-06-2018:             Initial release
-18-06-2018:             Added verbose switch
-19-06-2018:             Check VDI machines variable before showing differences
-06-07-2018:             Added timestamp to verbose logging
-02-08-2018:             Load static variables from json file
 #>
 
     
@@ -28,17 +21,31 @@ function Start-CompareVDIs {
 
     [CmdletBinding()]
     param()
+ 
+    if (!($configfile)) {
+        Write-Verbose "[$(Get-Date)] Variable configfile not set properly"
+        break
+    }
+    
+    else {
+        $config = Get-Content `
+            -Path $configfile `
+            -Raw | ConvertFrom-Json
+    }
 
-    $hashvm = Import-Clixml -Path "D:\Scripts\Creds\nlsvcvmwa.cred"
-
-    #load static variables using json file
-    Write-Verbose "[$(Get-Date)] Loading data from JSON"
-    $config = Get-Content `
-        -Path $configfile `
-        -Raw | ConvertFrom-Json
+    if ($env:UserName -eq $config.nlsvcvmwa) {
+        Write-Verbose "[$(Get-Date)] Loading credentials"
+        $hashvm = Import-Clixml `
+            -Path "D:\Scripts\Creds\nlsvcvmwa.cred"
+    }
+    
+    else {
+        Write-Verbose "[$(Get-Date)] Run this script as a different user"
+        break
+    }
 
     #load module
-    If ( ! (Get-Module VMware.Hv.Helper) ) {
+    If (!(Get-Module VMware.Hv.Helper) ) {
         Write-Verbose "[$(Get-Date)] Loading VMware HV Helper module"
         Import-Module VMware.Hv.Helper
     }
@@ -61,7 +68,7 @@ function Start-CompareVDIs {
 
     Write-Verbose "[$(Get-Date)] Extracting desktops from active directory"
     $addesktops = Get-ADComputer `
-        -ldapFilter "(!(cn=NLGLD*))" `
+        -ldapFilter (!($config.ldapfilter)) `
         -SearchBase $config.ouvdi `
         -Properties * | Select-Object `
         -ExpandProperty Name
