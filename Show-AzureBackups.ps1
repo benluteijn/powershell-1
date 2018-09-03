@@ -23,7 +23,8 @@ Function Show-AzureBackups {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        $Days
+        [ValidateRange([int]::MinValue,-1)]
+        [int] $Days
     )
 
     $hashazure = Import-Clixml `
