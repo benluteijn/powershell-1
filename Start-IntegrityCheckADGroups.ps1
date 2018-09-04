@@ -30,41 +30,49 @@ function Start-IntegrityCheckADGroups {
         break
     }
         
+
     else {
         $config = Get-Content `
             -Path $configfile `
             -Raw | ConvertFrom-Json
     }
     
+
     if ($env:UserName -eq $config.nlsvcintegritych) {
         Write-Verbose "[$(Get-Date)] Loading credentials"
         $hashadcheck = Import-Clixml `
             -Path "D:\Scripts\Creds\nlsvcintegritych.cred"
     }
         
+
     else {
         Write-Verbose "[$(Get-Date)] Run this script as a different user"
         break
     }
+
 
     #load modules
     if (Get-Module ActiveDirectory) {
         Write-Verbose "[$(Get-Date)] Active directory module already available"
     }
     
+
     else {
         Write-Verbose "[$(Get-Date)] Loading active directory module"
         Import-Module ActiveDirectory
     }
 
+
     #create exception list
     Write-Verbose "[$(Get-Date)] Creating exception list"
     $domaincontrollers = $config.domaincontrollers
+
 
     $params = @{
         Filter = {OperatingSystem -like "Windows Server*" -and Description -like "failover*"}
     } 
     
+
     $failover = Get-ADComputer @params | 
         Select-Object -ExpandProperty Name
 
