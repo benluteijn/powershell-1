@@ -6,15 +6,13 @@ Creates AD securitygroups related to remote desktop and local administrator acce
 This function creates missing AD security groups using a specific naming convention. It extracts existing groups from AD and compares them with all servers.
 
 .EXAMPLE
-Start-IntegrityCheckADGroups
+Start-IntegrityCheckADGroups -verbose
 
 .NOTES
 Function name:          Start-IntegrityCheckADGroups
 Author:                 Dennis Kool
 DateCreated:            19-04-2018
 DateModified:           22-05-2018
-Reviewed by:            Ben Luteijn
-Last review date:       01-05-2018
 
 .NOTES
 19-04-2018:             Initial release
@@ -50,61 +48,64 @@ function Start-IntegrityCheckADGroups {
     }
 
     #load modules
-    If (Get-Module ActiveDirectory) {
+    if (Get-Module ActiveDirectory) {
         Write-Verbose "[$(Get-Date)] Active directory module already available"
     }
+    
     else {
         Write-Verbose "[$(Get-Date)] Loading active directory module"
         Import-Module ActiveDirectory
     }
 
-    #create dynamic exception list
+    #create exception list
     Write-Verbose "[$(Get-Date)] Creating exception list"
     $domaincontrollers = $config.domaincontrollers
 
-    $Servers = Get-ADComputer `
-        -Filter {OperatingSystem -Like "Windows Server*"} `
-        -Properties * |select-Object * `
-        -expandproperty name
+    $params = @{
+        Filter = {OperatingSystem -like "Windows Server*" -and Description -like "failover*"}
+    } 
+    
+    $failover = Get-ADComputer @params | 
+        Select-Object -ExpandProperty Name
 
-    $failover = $servers | Where-Object {
-        $_.description -like "*failover*"} | Select-Object `
-        -ExpandProperty Name
-
-    $exception = $domaincontrollers + $failover
+    $exclusions = $domaincontrollers + $failover
 
     #create list of servers and security groups
     Write-Verbose  "[$(Get-Date)] Extracting existing LAM groups from active directory"
-    $ExistingLamGroups = Get-ADGroup `
-        -filter * | Where-Object {
-        $_.Name -like $config.ADGroupPrefixLamWildcard} | Select-Object `
-        -ExpandProperty Name
-
+        $params = @{
+            Filter = "Name -like '$($config.ADGroupPrefixLamWildcard)'"
+    } 
+    
+    $ExistingLamGroups = Get-ADGroup @params |
+        Select-Object -ExpandProperty Name
+       
     Write-Verbose  "[$(Get-Date)] Extracting existing RDP groups from active directory"
-    $ExistingRdpGroups = Get-ADGroup `
-        -filter * | Where-Object {
-        $_.Name -like $config.ADGroupPrefixRdpWildcard} | Select-Object `
-        -ExpandProperty Name
+        $params = @{
+            Filter = "Name -like '$($config.ADGroupPrefixRdpWildcard)'"
+    } 
 
-    $ExistingLamGroup = foreach ($line in $ExistingLamGroups) {
-        $line -replace $config.ADGroupPrefixLam, ""
-    }
+    $ExistingRdpGroups = Get-ADGroup @params |
+        Select-Object -ExpandProperty Name
 
-    $ExistingRdpGroup = foreach ($lines in $ExistingRdpGroups) {
-        $lines -replace $config.ADGroupPrefixRdp, ""
-    }
+    $ExistingLamGroup = $ExistingLamGroups -replace
+        $config.ADGroupPrefixLam
+
+    $ExistingRdpGroup = $ExistingRdpGroups -replace
+        $config.ADGroupPrefixRdp
 
     Write-Verbose "[$(Get-Date)] Extracting server list from active directory"
-    $servernames = Get-ADComputer `
-        -Filter {OperatingSystem -Like "Windows Server*"} `
-        -Properties * |select-Object * `
-        -expandproperty Name
+        $params = @{
+            Filter = {OperatingSystem -like "Windows Server*"}
+    }
+
+    $servernames = Get-ADComputer @params |
+        Select-Object -ExpandProperty Name
 
     #compare and loop through it to create new ADgroups and trim whitespaces
     Write-Verbose "[$(Get-Date)] Comparing existing LAM groups against all servers"
     $compareLAM = $servernames | Where-Object {
-        $ExistingLamGroup -notcontains $_.trim() -and `
-            $exception -notcontains $_.trim()
+        $ExistingLamGroup -notcontains $_.trim() -and 
+        $exclusions -notcontains $_.trim()
     }
 
     if (!$compareLAM) {
@@ -113,20 +114,20 @@ function Start-IntegrityCheckADGroups {
 
     #cleanup groups with no existing AD object
     $cleanupLamGroups = $ExistingLamGroup | Where-Object {
-        $servernames -notcontains $_.trim() -and `
-            $exception -notcontains $_.trim()
+        $servernames -notcontains $_.trim() -and
+            $exclusions -notcontains $_.trim()
     }
 
     $cleanupRdpGroups = $ExistingRdpGroup | Where-Object {
-        $servernames -notcontains $_.trim() -and `
-            $exception -notcontains $_.trim()
+        $servernames -notcontains $_.trim() -and
+            $exclusions -notcontains $_.trim()
     }
 
     #compare and loop through it to create new ADgroups and trim whitespaces
     Write-Verbose "[$(Get-Date)] Comparing existing RDP groups against all servers"
     $compareRDP = $servernames | Where-Object {
-        $ExistingRdpGroup -notcontains $_.trim() -and `
-            $exception -notcontains $_.trim()
+        $ExistingRdpGroup -notcontains $_.trim() -and
+            $exclusions -notcontains $_.trim()
     }
 
     if (!$compareRDP) {
@@ -143,7 +144,15 @@ function Start-IntegrityCheckADGroups {
             -Description "Local Admin group to server $name" `
             -Credential $hashadcheck.svcintegritych >$null `
             -GroupScope "Universal" 
-   
+        
+      #  $params @{
+      #      Name = $name1
+      #      Path = $config.ADOU_LAM
+      #      Description = "Local admin group to server $name"
+      #      Credential = $hashadcheck.svcintegritych >$null
+      #      GroupScope = "Universal"
+      #  }
+
     }
 
     #create RDP groups
