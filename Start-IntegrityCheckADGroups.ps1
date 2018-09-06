@@ -85,7 +85,7 @@ function Start-IntegrityCheckADGroups {
             Select-Object -ExpandProperty Name
 
         $ExistingLamGroup = $ExistingLamGroups -replace
-        $config.ADGroupPrefixLam
+            $config.ADGroupPrefixLam
     } 
 
     if ([string]::IsNullOrEmpty($ExistingRdpGroups)) {
