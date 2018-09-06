@@ -120,106 +120,40 @@ function Start-IntegrityCheckADGroups {
 
     #create LAM groups
     foreach ($name in $compareLAM) {
-        $namel = $config.ADGroupPrefixLam + $name
-        Write-Verbose "[$(Get-Date)] Creating LAM security groups $namel"
-        New-ADGroup `
-            -Name $namel `
-            -Path $config.ADOU_LAM `
-            -Description "Local Admin group to server $name" `
-            -Credential $hashadcheck.svcintegritych >$null `
-            -GroupScope "Universal" 
-        
-        #  $params @{
-        #      Name = $name1
-        #      Path = $config.ADOU_LAM
-        #      Description = "Local admin group to server $name"
-        #      Credential = $hashadcheck.svcintegritych >$null
-        #      GroupScope = "Universal"
-        #  }
-
-    }
-
+        $namel = $config.ADGroupPrefixLam +$name
+        Write-Verbose "[$(Get-Date)] Creating LAM security groups $name1"
+        $params = @{Name = $name1; Path = $config.ADOU_LAM; Description = "Local admin group to server $name"; GroupScope = "Universal" }
+        New-ADGroup @params}
+  
     #create RDP groups
     foreach ($names in $compareRDP) {
         $namesc = $config.ADGroupPrefixRdp + $names
-        New-ADGroup `
-            -Name $namesc `
-            -Path $config.ADOU_RDP `
-            -Description "Local RDP group to server $names" `
-            -Credential $hashadcheck.svcintegritych >$null `
-            -GroupScope "Universal"
         Write-Verbose "[$(Get-Date)] Creating RDP security groups $namesc"
-    }
+        $params = @{Name = $namesc; Path = $config.ADOU_RDP; Description = "Local RDP group to server $names"; GroupScope = "Universal" }
+        New-ADGroup @params}
 
     #cleanup groups with no existing AD object
-    if ($cleanupLamGroups) {
+    if ([string]::IsNullOrEmpty($cleanupLamGroups)) {
         Write-Verbose "[$(Get-Date)] Cleanup LAM groups with no existing AD object"
         foreach ($entry in $cleanupLamGroups) {
             $cleanupgroupslam = $config.ADGroupPrefixLam + $entry
+            Write-Verbose "[$(Get-Date)] No object found for group $cleanupgroupslam"
             #Remove-ADGroup `
             #-Identity "$ADGroupPrefixLam$entry" `
             #-Credential $hash.domainadmin `
             #-Confirm:$false
-            Write-Verbose "[$(Get-Date)] No object found for group $cleanupgroupslam"
         }
     }
-    else {
-        Write-Verbose "[$(Get-Date)] All LAM groups have corresponding AD objects"
-    }
 
-    if ($cleanupRdpGroups) {
+    if ([string]::IsNullOrEmpty($cleanupRdpGroups)) {
         Write-Verbose "[$(Get-Date)] Cleanup RDP groups with no existing AD object"
         foreach ($entrys in $cleanupRdpGroups) {
             $cleanupgroupsrdp = $config.ADGroupPrefixRdp + $entrys
+            Write-Verbose "[$(Get-Date)] No object found for group $cleanupgroupsrdp"
             #Remove-ADGroup `
             #-Identity "$ADGroupPrefixRdp$entry" `
             #-Credential $hash.domainadmin `
-            #-Confirm:$false
-            Write-Verbose "[$(Get-Date)] No object found for group $cleanupgroupsrdp"
+            #-Confirm:$false 
         }
     }
-    else {
-        Write-Verbose "[$(Get-Date)] All RDP groups have corresponding AD objects"
-    }
-    
-    #enforce empty or wrong descriptions LAM groups
-    $emptydescrlam = Get-ADGroup `
-        -Filter * -Properties * `
-        -SearchBase $config.adou_lam | Where-Object {
-        $_.name -like $config.adgroupprefixlamwildcard `
-            -and $_.description -eq $null `
-            -or $_.description -notlike $config.adgroupdescrlam} | Select-Object `
-        -ExpandProperty Name
-      
-    Write-Verbose "[$(Get-Date)] Enforcing descriptions LAM security groups"
-    foreach ($entry in $emptydescrlam) {
-        $descrnamelam = $entry `
-            -replace $config.adgroupprefixlam, ''
-        Set-ADGroup `
-            -Identity "$entry" `
-            -Description "Local Admin group to server $descrnamelam" `
-            -GroupScope "Universal"
-        Write-Verbose "[$(Get-Date)] Enforing description for group $entry"
-    }
-
-    #enforce empty or wrong descriptions RDP groups
-    $emptydescrrdp = Get-ADGroup `
-        -Filter * -Properties * `
-        -SearchBase $config.adou_rdp | Where-Object {
-        $_.name -like $config.adgroupprefixrdpwildcard `
-            -and $_.description -eq $null `
-            -or $_.description -notlike $config.adgroupdescrrdp} | Select-Object `
-        -Expandproperty Name
-
-    Write-Verbose "[$(Get-Date)] Enforcing descriptions RDP security groups"
-    foreach ($line in $emptydescrrdp) {
-        $descrnamerdp = $line `
-            -replace $config.adgroupprefixrdp, ''
-        Set-ADGroup `
-            -Identity "$line" `
-            -Description "Local RDP group to server $descrnamerdp" `
-            -GroupScope "Universal"
-        Write-Verbose "[$(Get-Date)] Enforcing description for group $line"
-    }
-
 }
