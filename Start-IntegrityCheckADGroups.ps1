@@ -30,39 +30,33 @@ function Start-IntegrityCheckADGroups {
         break
     }
         
-
     else {
         $config = Get-Content `
             -Path $configfile `
             -Raw | ConvertFrom-Json
     }
     
-
     if ($env:UserName -eq $config.nlsvcintegritych) {
         Write-Verbose "[$(Get-Date)] Loading credentials"
         $hashadcheck = Import-Clixml `
             -Path "D:\Scripts\Creds\nlsvcintegritych.cred"
     }
         
-
     else {
         Write-Verbose "[$(Get-Date)] Run this script as a different user"
         break
     }
-
 
     #load modules
     if (Get-Module ActiveDirectory) {
         Write-Verbose "[$(Get-Date)] Active directory module already available"
     }
     
-
     else {
         Write-Verbose "[$(Get-Date)] Loading active directory module"
         Import-Module ActiveDirectory
     }
 
-<<<<<<< HEAD
     #create exception list.
     if ([string]::IsNullOrEmpty($domaincontrollers)) {
         Write-Verbose "[$(Get-Date)] Creating exception list"
@@ -70,67 +64,39 @@ function Start-IntegrityCheckADGroups {
     }  
     
     if ([string]::IsNullOrEmpty($exclusions)) {
-        $params = @{
-            Filter = {OperatingSystem -like "Windows Server*" -and
-                Description -like "failover*"}
-        } 
+        $params = @{Filter = {OperatingSystem -like "Windows Server*" -and
+            Description -like "failover*"}} 
+        
         $failover = Get-ADComputer @params | 
             Select-Object -ExpandProperty Name
-        
         $exclusions = $domaincontrollers + $failover
     } 
   
-=======
-
-    #create exception list
-    Write-Verbose "[$(Get-Date)] Creating exception list"
-    $domaincontrollers = $config.domaincontrollers
-
-
-    $params = @{
-        Filter = {OperatingSystem -like "Windows Server*" -and Description -like "failover*"}
-    } 
-    
-
-    $failover = Get-ADComputer @params | 
-        Select-Object -ExpandProperty Name
-
-    $exclusions = $domaincontrollers + $failover
-
->>>>>>> cd7cc30c25933d56f0ac1783516b54224a14e469
     #create list of servers and security groups
     if ([string]::IsNullOrEmpty($ExistingLamGroups)) {
         Write-Verbose "[$(Get-Date)] Extracting existing LAM groups from active directory"
-        $params = @{
-            Filter = "Name -like '$($config.ADGroupPrefixLamWildcard)'"
-        } 
-        
+        $params = @{Filter = "Name -like '$($config.ADGroupPrefixLamWildcard)'"}
         $ExistingLamGroups = Get-ADGroup @params |
             Select-Object -ExpandProperty Name
 
         $ExistingLamGroup = $ExistingLamGroups -replace
-            $config.ADGroupPrefixLam
+        $config.ADGroupPrefixLam
     } 
 
     if ([string]::IsNullOrEmpty($ExistingRdpGroups)) {
         Write-Verbose  "[$(Get-Date)] Extracting existing RDP groups from active directory"
-        $params = @{
-            Filter = "Name -like '$($config.ADGroupPrefixRdpWildcard)'"
-        } 
-        
+        $params = @{Filter = "Name -like '$($config.ADGroupPrefixRdpWildcard)'"} 
         $ExistingRdpGroups = Get-ADGroup @params | 
             Select-Object -ExpandProperty Name
         
         $ExistingRdpGroup = $ExistingRdpGroups -replace
-            $config.ADGroupPrefixRdp
+        $config.ADGroupPrefixRdp
     }
 
     if ([string]::IsNullOrEmpty($servernames)) {
         Write-Verbose "[$(Get-Date)] Extracting server list from active directory"
-        $params = @{
-            Filter = {OperatingSystem -like "Windows Server*"}
-        }
-        
+        $params = @{Filter = {OperatingSystem -like "Windows Server*"}}
+
         $servernames = Get-ADComputer @params |
             Select-Object -ExpandProperty Name
     }
@@ -139,8 +105,8 @@ function Start-IntegrityCheckADGroups {
     if ([string]::IsNullOrEmpty($compareLAM)) {
         Write-Verbose "[$(Get-Date)] Comparing existing LAM groups against all servers"
         $compareLAM = $servernames | Where-Object {
-            $ExistingLamGroup -notcontains $_.trim() -and 
-            $exclusions -notcontains $_.trim()
+        $ExistingLamGroup -notcontains $_.trim() -and 
+        $exclusions -notcontains $_.trim()
         }
     }
 
