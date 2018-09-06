@@ -32,6 +32,10 @@ function Start-IntegrityCheckADGroups {
         $config = Get-Content @params | ConvertFrom-Json
     }
 
+    else {
+        Write-Verbose "Variable config already exists"
+    }
+
     #load credentials
     if ($env:UserName -eq $config.nlsvcintegritych) {
         Write-Verbose "[$(Get-Date)] Loading credentials"
@@ -54,13 +58,21 @@ function Start-IntegrityCheckADGroups {
     if ([string]::IsNullOrEmpty($domaincontrollers)) {
         Write-Verbose "[$(Get-Date)] Creating exclusion list"
         $domaincontrollers = $config.domaincontrollers
-    }  
+    }
+
+    else {
+        Write-Verbose "[$(Get-Date)] Variable domaincontrollers already exists"
+    }
     
     if ([string]::IsNullOrEmpty($exclusions)) {
         $params = @{Filter = {OperatingSystem -like "Windows Server*" -and Description -like "failover*"}} 
         $failover = Get-ADComputer @params | Select-Object -ExpandProperty Name
         $exclusions = $domaincontrollers + $failover
-    } 
+    }
+
+    else {
+        Write-Verbose "[$(Get-Date)] Variable exclusions already exists"
+    }
   
     #create list of servers and security groups
     if ([string]::IsNullOrEmpty($ExistingLamGroups)) {
@@ -70,6 +82,10 @@ function Start-IntegrityCheckADGroups {
         $ExistingLamGroup = $ExistingLamGroups -replace
         $config.ADGroupPrefixLam
     } 
+    
+    else {
+        Write-Verbose "[$(Get-Date)] Variable existingLAMGroups already exists"
+    }
 
     if ([string]::IsNullOrEmpty($ExistingRdpGroups)) {
         Write-Verbose  "[$(Get-Date)] Extracting existing RDP groups from active directory"
@@ -79,10 +95,18 @@ function Start-IntegrityCheckADGroups {
         $config.ADGroupPrefixRdp
     }
 
+    else {
+        Write-Verbose "[$(Get-Date)] Variable ExistingRdpGroups already exists"
+    }
+
     if ([string]::IsNullOrEmpty($servernames)) {
         Write-Verbose "[$(Get-Date)] Extracting server list from active directory"
         $params = @{Filter = {OperatingSystem -like "Windows Server*"}}
         $servernames = Get-ADComputer @params | Select-Object -ExpandProperty Name
+    }
+
+    else {
+        Write-Verbose "[$(Get-Date)] Variable servernames already exists"
     }
 
     #compare and loop through it to create new ADgroups and trim whitespaces
@@ -94,12 +118,20 @@ function Start-IntegrityCheckADGroups {
         }
     }
 
+    else {
+        Write-Verbose "[$(Get-Date)] Variable compareLAM already exists"
+    }
+
     #cleanup groups with no existing AD object
     if ([string]::IsNullOrEmpty($cleanupLamGroups)) {
         $cleanupLamGroups = $ExistingLamGroup | Where-Object {
         $servernames -notcontains $_.trim() -and
         $exclusions -notcontains $_.trim()
         }
+    }
+
+    else {
+        Write-Verbose "[$(Get-Date)] Variable cleanupLamGroups already exists"
     }
 
     if ([string]::IsNullOrEmpty($cleanupRdpGroups)) {
@@ -109,6 +141,10 @@ function Start-IntegrityCheckADGroups {
         }
     }
 
+    else {
+        Write-Verbose "[$(Get-Date)] Variable cleanupRdpGroups already exists"
+    }
+
     #compare and loop through it to create new ADgroups and trim whitespaces
     if ([string]::IsNullOrEmpty($compareRDP)) {
         Write-Verbose "[$(Get-Date)] Comparing existing RDP groups against all servers"
@@ -116,6 +152,10 @@ function Start-IntegrityCheckADGroups {
         $ExistingRdpGroup -notcontains $_.trim() -and
         $exclusions -notcontains $_.trim()
         }
+    }
+
+    else {
+        Write-Verbose "[$(Get-Date)] Variable compareRDP already exists"
     }
 
     #create LAM groups
@@ -145,6 +185,10 @@ function Start-IntegrityCheckADGroups {
         }
     }
 
+    else {
+        Write-Verbose "[$(Get-Date)] Variable cleanupLamGroups already exists"
+    }
+
     if ([string]::IsNullOrEmpty($cleanupRdpGroups)) {
         Write-Verbose "[$(Get-Date)] Cleanup RDP groups with no existing AD object"
         foreach ($entrys in $cleanupRdpGroups) {
@@ -155,5 +199,9 @@ function Start-IntegrityCheckADGroups {
             #-Credential $hash.domainadmin `
             #-Confirm:$false 
         }
+    }
+     
+    else {
+        Write-Verbose "[$(Get-Date)] Variable cleanupRdpGroups already exists"
     }
 }
