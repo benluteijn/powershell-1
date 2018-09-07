@@ -32,18 +32,17 @@ Function Start-GenerateMail {
 
     #load static variables using json file
     if ([string]::IsNullOrEmpty($config)) {
-        Write-Verbose "[$(Get-Date)] Settings config file variable"
+        Write-Verbose "[$(Get-Date)] Setting config file variable"
         $params = @{
             Path = $configfile
             Raw  = $true}
             $config = Get-Content @params |
-            ConvertFrom-Json
-    }
+            ConvertFrom-Json}
 
     if ($ModuleCustomVMWare) {
         $file = ($config.'outputvmware-available-vdi' +
             "$((Get-Date).ToString('MM-dd-yyyy')).log"),
-        ($config.'outputvmware-compare-vdi' +
+            ($config.'outputvmware-compare-vdi' +
             "$((Get-Date).ToString('MM-dd-yyyy')).log")
             
         foreach ($entry in $file) {
