@@ -52,7 +52,9 @@ function Show-DfsShares {
             }
         }
         if ([string]::IsNullOrEmpty($DfsShares)) {
-            $DfsShares = $DfsFolderTargets | Select-Object Path, TargetPath | Sort-Object TargetPath
+            $DfsShares = $DfsFolderTargets |
+            Select-Object Path, TargetPath |
+            Sort-Object TargetPath
             write-verbose ($DfsShares | Out-String)
         }
     }
