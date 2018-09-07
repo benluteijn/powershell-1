@@ -49,22 +49,13 @@ Function Start-GenerateMail {
             $existfile = Test-Path -Path $entry
             if ($existfile -eq "True") {
                 Write-Verbose "[$(Get-Date)] $entry found. Sending mail"
-                $params = @{
-                    To          = $config.mailto
-                    From        = $config.mailfrom
-                    Subject     = $config.mailsubject
-                    Attachments = $entry
-                    Body        = "Expected file $entry found on server $env:COMPUTERNAME"
-                    Smtpserver  = $config.smtpserver
-                    Verbose     = $true }
-                    Send-MailMessage @params
+                Start-SendMail}
             }
-            
             else {
                 Write-Verbose "[$(Get-Date)] $entry not found."
             }
         }
-    }
+    
 
     if ($ModuleCustomIntegrityCheck) {
         Write-Verbose "[$(Get-Date)] Searching for filenames for CustomIntegrityCheck module"
@@ -74,23 +65,12 @@ Function Start-GenerateMail {
             $existfile = Test-Path -Path $entry
             if ($existfile -eq "True") {
                 Write-Verbose "[$(Get-Date)] $entry found. Sending mail"
-                $params = @{
-                    To          = $config.mailto
-                    From        = $config.mailfrom
-                    Subject     = $config.mailsubject
-                    Attachments = $entry
-                    Body        = "Expected file $entry found on server $env:COMPUTERNAME"
-                    Smtpserver  = $config.smtpserver
-                    Verbose     = $true }
-                    Send-MailMessage @params
+                Start-SendMail}
             }
-
             else {
                 Write-Verbose "[$(Get-Date)] $entry not found."
             }
         }
-
-    }
 
     if ($ModuleCustomAzure) {
         Write-Verbose "[$(Get-Date)] Creating array with filenames for manifest module CustomAzure"
@@ -100,22 +80,22 @@ Function Start-GenerateMail {
             $existfile = Test-Path -Path $entry
             if ($existfile -eq "True") {
                 Write-Verbose "[$(Get-Date)] $entry found. Sending mail"
-                $params = @{
-                    To          = $config.mailto
-                    From        = $config.mailfrom
-                    Subject     = $config.mailsubject
-                    Attachments = $entry
-                    Body        = "Expected file $entry found on server $env:COMPUTERNAME"
-                    Smtpserver  = $config.smtpserver
-                    Verbose     = $true }
-                    Send-MailMessage @params
-            }
-                    
+                Start-SendMail}   
             else {
                 Write-Verbose "[$(Get-Date)] $entry not found."
             }
         }
-
     }
 
+    Function Start-SendMail {
+        $params = @{
+            To = $config.mailto
+            From = $config.mailfrom
+            Subject = $config.mailsubject
+            Attachments = $entry
+            Body = "Expected file $entry found on server $env:COMPUTERNAME"
+            Smtpserver = $config.smtpserver
+            Verbose = $true }
+            Send-MailMessage @params
+    }
 }
