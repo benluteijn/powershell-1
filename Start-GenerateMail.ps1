@@ -59,7 +59,6 @@ Function Start-GenerateMail {
         }
     }
     
-
     if ($ModuleCustomIntegrityCheck) {
         $file = ($config.'outputIntegrityCheck-ad-creategroups' +
             "$((Get-Date).ToString('MM-dd-yyyy')).log")
