@@ -31,7 +31,8 @@ function Start-IntegrityCheckADGroups {
         $params = @{
             Path = $configfile
             Raw = $true}
-            $config = Get-Content @params | ConvertFrom-Json
+            $config = Get-Content @params |
+            ConvertFrom-Json
     }
 
     #load credentials
@@ -171,3 +172,5 @@ function Start-IntegrityCheckADGroups {
             #-Confirm:$false 
         }
     }
+     
+}
