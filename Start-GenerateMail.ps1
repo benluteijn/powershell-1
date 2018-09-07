@@ -41,46 +41,53 @@ Function Start-GenerateMail {
     }
 
     if ($ModuleCustomVMWare) {
-        Write-Verbose "[$(Get-Date)] Searching for filenames for CustomVMWare module"
-        $file = @("$outputfolder\ShowAvailableVDIs\vmware-available-vdi-$((Get-Date).ToString('MM-dd-yyyy')).log",
-            "$outputfolder\StartCompareVDIs\vmware-compare-vdi-$((Get-Date).ToString('MM-dd-yyyy')).log")
+        $file = ($config.'outputvmware-available-vdi' +
+            "$((Get-Date).ToString('MM-dd-yyyy')).log"),
+        ($config.'outputvmware-compare-vdi' +
+            "$((Get-Date).ToString('MM-dd-yyyy')).log")
             
         foreach ($entry in $file) {
             $existfile = Test-Path -Path $entry
             if ($existfile -eq "True") {
                 Write-Verbose "[$(Get-Date)] $entry found. Sending mail"
-                Start-SendMail}
-            }
-            else {
-                Write-Verbose "[$(Get-Date)] $entry not found."
+                Start-SendMail
             }
         }
+            
+        else {
+            Write-Verbose "[$(Get-Date)] $entry not found."
+        }
+    }
     
 
     if ($ModuleCustomIntegrityCheck) {
-        Write-Verbose "[$(Get-Date)] Searching for filenames for CustomIntegrityCheck module"
-        $file = @("$outputfolder\StartIntegrityCheckADGroups\ad-creategroups-$((Get-Date).ToString('MM-dd-yyyy')).log")
-    
+        $file = ($config.'outputIntegrityCheck-ad-creategroups' +
+            "$((Get-Date).ToString('MM-dd-yyyy')).log")
+ 
         foreach ($entry in $file) {
             $existfile = Test-Path -Path $entry
             if ($existfile -eq "True") {
                 Write-Verbose "[$(Get-Date)] $entry found. Sending mail"
-                Start-SendMail}
-            }
-            else {
-                Write-Verbose "[$(Get-Date)] $entry not found."
+                Start-SendMail
             }
         }
+            
+        else {
+            Write-Verbose "[$(Get-Date)] $entry not found."
+        }
+    }
 
     if ($ModuleCustomAzure) {
-        Write-Verbose "[$(Get-Date)] Creating array with filenames for manifest module CustomAzure"
-        $file = @("$outputfolder\ShowAzureBackups\azure-backups-$((Get-Date).ToString('MM-dd-yyyy')).log")
-    
+        $file = ($config.'outputazure-backups' +
+            "$((Get-Date).ToString('MM-dd-yyyy')).log")
+
         foreach ($entry in $file) {
             $existfile = Test-Path -Path $entry
             if ($existfile -eq "True") {
                 Write-Verbose "[$(Get-Date)] $entry found. Sending mail"
-                Start-SendMail}   
+                Start-SendMail
+            }   
+            
             else {
                 Write-Verbose "[$(Get-Date)] $entry not found."
             }
@@ -95,7 +102,7 @@ Function Start-GenerateMail {
             Attachments = $entry
             Body = "Expected file $entry found on server $env:COMPUTERNAME"
             Smtpserver = $config.smtpserver
-            Verbose = $true }
+            Verbose = $true}
             Send-MailMessage @params
     }
 }
