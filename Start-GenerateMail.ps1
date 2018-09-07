@@ -30,75 +30,65 @@ Function Start-GenerateMail {
         [switch] $ModuleCustomAzure
     )
 
-    #variable JSON file path is set in profile
-    Write-Verbose "[$(Get-Date)] Loading data from JSON"
-    $config = Get-Content `
-        -Path $configfile `
-        -Raw | ConvertFrom-Json
+    #load static variables using json file
+    if ([string]::IsNullOrEmpty($config)) {
+        Write-Verbose "[$(Get-Date)] Settings config file variable"
+        $params = @{
+            Path = $configfile
+            Raw  = $true}
+            $config = Get-Content @params |
+            ConvertFrom-Json
+    }
 
     if ($ModuleCustomVMWare) {
-        Write-Verbose "[$(Get-Date)] Creating array with filenames for manifest module CustomVMWare"
+        Write-Verbose "[$(Get-Date)] Searching for filenames for CustomVMWare module"
         $file = @("$outputfolder\ShowAvailableVDIs\vmware-available-vdi-$((Get-Date).ToString('MM-dd-yyyy')).log",
             "$outputfolder\StartCompareVDIs\vmware-compare-vdi-$((Get-Date).ToString('MM-dd-yyyy')).log")
             
-        Foreach ($entry in $file) {
+        foreach ($entry in $file) {
             $existfile = Test-Path -Path $entry
             if ($existfile -eq "True") {
                 Write-Verbose "[$(Get-Date)] $entry found. Sending mail"
-                Send-MailMessage `
-                    -To $config.mailto `
-                    -from $config.mailfrom `
-                    -Subject $config.mailsubject `
-                    -Attachments $entry `
-                    -Body "Expected file $entry found on server $env:COMPUTERNAME." `
-                    -SmtpServer $config.smtpserver `
-                    -Verbose
+                $params = @{
+                    To          = $config.mailto
+                    From        = $config.mailfrom
+                    Subject     = $config.mailsubject
+                    Attachments = $entry
+                    Body        = "Expected file $entry found on server $env:COMPUTERNAME"
+                    Smtpserver  = $config.smtpserver
+                    Verbose     = $true }
+                    Send-MailMessage @params
             }
+            
             else {
-                Write-Verbose "[$(Get-Date)] $entry not found. Sending mail"
-                Send-MailMessage `
-                    -To $config.mailto `
-                    -from $config.mailfrom `
-                    -Subject $config.mailsubject `
-                    -Body "Expected file $entry not found on server $env:COMPUTERNAME. Please investigate" `
-                    -SmtpServer $config.smtpserver `
-                    -Verbose
+                Write-Verbose "[$(Get-Date)] $entry not found."
             }
-        
-        }    
-
+        }
     }
 
     if ($ModuleCustomIntegrityCheck) {
-        Write-Verbose "[$(Get-Date)] Creating array with filenames for manifest module CustomIntegrityCheck"
+        Write-Verbose "[$(Get-Date)] Searching for filenames for CustomIntegrityCheck module"
         $file = @("$outputfolder\StartIntegrityCheckADGroups\ad-creategroups-$((Get-Date).ToString('MM-dd-yyyy')).log")
     
-        Foreach ($entry in $file) {
+        foreach ($entry in $file) {
             $existfile = Test-Path -Path $entry
             if ($existfile -eq "True") {
                 Write-Verbose "[$(Get-Date)] $entry found. Sending mail"
-                Send-MailMessage `
-                    -To $config.mailto `
-                    -from $config.mailfrom `
-                    -Subject $config.mailsubject `
-                    -Attachments $entry `
-                    -Body "Expected file $entry found on server $env:COMPUTERNAME." `
-                    -SmtpServer $config.smtpserver `
-                    -Verbose
+                $params = @{
+                    To          = $config.mailto
+                    From        = $config.mailfrom
+                    Subject     = $config.mailsubject
+                    Attachments = $entry
+                    Body        = "Expected file $entry found on server $env:COMPUTERNAME"
+                    Smtpserver  = $config.smtpserver
+                    Verbose     = $true }
+                    Send-MailMessage @params
             }
+
             else {
-                Write-Verbose "[$(Get-Date)] $entry not found. Sending mail"
-                Send-MailMessage `
-                    -To $config.mailto `
-                    -from $config.mailfrom `
-                    -Subject $config.mailsubject `
-                    -Body "Expected file $entry not found on server $env:COMPUTERNAME. Please investigate" `
-                    -SmtpServer $config.smtpserver `
-                    -Verbose
-           
-            }    
-    
-        }  
+                Write-Verbose "[$(Get-Date)] $entry not found."
+            }
+        }
 
     }
 
@@ -106,32 +96,25 @@ Function Start-GenerateMail {
         Write-Verbose "[$(Get-Date)] Creating array with filenames for manifest module CustomAzure"
         $file = @("$outputfolder\ShowAzureBackups\azure-backups-$((Get-Date).ToString('MM-dd-yyyy')).log")
     
-        Foreach ($entry in $file) {
+        foreach ($entry in $file) {
             $existfile = Test-Path -Path $entry
             if ($existfile -eq "True") {
                 Write-Verbose "[$(Get-Date)] $entry found. Sending mail"
-                Send-MailMessage `
-                    -To $config.mailto `
-                    -from $config.mailfrom `
-                    -Subject $config.mailsubject `
-                    -Attachments $entry `
-                    -Body "Expected file $entry found on server $env:COMPUTERNAME." `
-                    -SmtpServer $config.smtpserver `
-                    -Verbose
+                $params = @{
+                    To          = $config.mailto
+                    From        = $config.mailfrom
+                    Subject     = $config.mailsubject
+                    Attachments = $entry
+                    Body        = "Expected file $entry found on server $env:COMPUTERNAME"
+                    Smtpserver  = $config.smtpserver
+                    Verbose     = $true }
+                    Send-MailMessage @params
             }
+                    
             else {
-                Write-Verbose "[$(Get-Date)] $entry not found. Sending mail"
-                Send-MailMessage `
-                    -To $config.mailto `
-                    -from $config.mailfrom `
-                    -Subject $config.mailsubject `
-                    -Body "Expected file $entry not found on server $env:COMPUTERNAME. Please investigate" `
-                    -SmtpServer $config.smtpserver `
-                    -Verbose
-           
-            }    
-    
-        }  
+                Write-Verbose "[$(Get-Date)] $entry not found."
+            }
+        }
 
     }
 
