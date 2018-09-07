@@ -91,6 +91,7 @@ Function Start-GenerateMail {
             }
         }
     }
+
     Function Start-SendMail {
         $params = @{
             To = $config.mailto
