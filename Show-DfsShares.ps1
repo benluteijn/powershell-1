@@ -9,13 +9,8 @@ This function extracts server and shares from DFS namespaces
 Show-DfsShares -verbose
 
 .NOTES
-Function name:          Show-DfsShares
-Author:                 Dennis Kool
-DateCreated:            27-08-2018
-DateModified:           07-09-2018
-
-.NOTES
-27-08-2018:             Initial release
+Author: Dennis Kool
+DateCreated: 27-08-2018
 #>
 
 
