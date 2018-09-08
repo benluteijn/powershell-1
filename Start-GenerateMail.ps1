@@ -11,7 +11,6 @@ Start-GenerateMail -ModuleCustomVMWare -Verbose
 Start-GenerateMail -ModuleCustomAzure -Verbose
 
 .NOTES
-Function: Start-GenerateMail
 Author: Dennis Kool
 DateCreated: 14-08-2018
 #>
