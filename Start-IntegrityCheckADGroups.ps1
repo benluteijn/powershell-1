@@ -22,7 +22,6 @@ function Start-IntegrityCheckADGroups {
     [CmdletBinding()]
     param()
 
-    
     #load static variables using json file
     if ([string]::IsNullOrEmpty($config)) {
         Write-Verbose "[$(Get-Date)] Settings config file variable"
