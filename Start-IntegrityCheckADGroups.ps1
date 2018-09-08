@@ -9,13 +9,8 @@ This function creates missing AD security groups using a specific naming convent
 Start-IntegrityCheckADGroups -verbose
 
 .NOTES
-Function name:          Start-IntegrityCheckADGroups
-Author:                 Dennis Kool
-DateCreated:            19-04-2018
-DateModified:           22-05-2018
-
-.NOTES
-19-04-2018:             Initial release
+Author: Dennis Kool
+DateCreated: 19-04-2018
 #>
 
 
