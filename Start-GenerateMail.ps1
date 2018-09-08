@@ -37,7 +37,7 @@ Function Start-GenerateMail {
     if ($ModuleCustomVMWare) {
         $file = ($config.'outputvmware-available-vdi' +
             "$((Get-Date).ToString('MM-dd-yyyy')).log"),
-        ($config.'outputvmware-compare-vdi' +
+            ($config.'outputvmware-compare-vdi' +
             "$((Get-Date).ToString('MM-dd-yyyy')).log")
             
         foreach ($entry in $file) {
