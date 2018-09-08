@@ -1,9 +1,12 @@
 <#
 .SYNOPSIS
-Creates AD securitygroups related to remote desktop and local administrator access
+Creates AD securitygroups related to remote desktop and local
+administrator access
 
 .DESCRIPTION
-This function creates missing AD security groups using a specific naming convention. It extracts existing groups from AD and compares them with all servers.
+This function creates missing AD security groups using a specific
+naming convention. It extracts existing groups from AD and compares
+them with all servers.
 
 .EXAMPLE
 Start-IntegrityCheckADGroups -verbose
