@@ -132,7 +132,8 @@ function Start-IntegrityCheckADGroups {
             Path = $config.ADOU_LAM
             Description = "Local admin group to server $name"
             GroupScope = "Universal" }
-            New-ADGroup @params}
+            New-ADGroup @params
+     }
   
     #create RDP groups
     foreach ($names in $compareRDP) {
@@ -143,7 +144,8 @@ function Start-IntegrityCheckADGroups {
             Path = $config.ADOU_RDP
             Description = "Local RDP group to server $names"
             GroupScope = "Universal" }
-            New-ADGroup @params}
+            New-ADGroup @params
+     }
 
     #cleanup groups with no existing AD object
     if ([string]::IsNullOrEmpty($cleanupLamGroups)) {
