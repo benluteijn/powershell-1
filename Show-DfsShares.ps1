@@ -50,7 +50,6 @@ function Show-DfsShares {
             $DfsShares = $DfsFolderTargets |
                 Select-Object Path, TargetPath | Sort-Object TargetPath
                 write-verbose ($DfsShares | Out-String)
-                dit is een test
         }
     }
 }
