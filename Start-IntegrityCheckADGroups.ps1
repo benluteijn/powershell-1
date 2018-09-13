@@ -13,7 +13,6 @@ Start-IntegrityCheckADGroups -verbose
 
 .NOTES
 Author: Dennis Kool
-DateCreated: 19-04-2018
 #>
 
 function Start-IntegrityCheckADGroups {
@@ -29,7 +28,8 @@ function Start-IntegrityCheckADGroups {
             Path = $configfile
             Raw = $true}
             $config = Get-Content @params |
-            ConvertFrom-Json}
+            ConvertFrom-Json
+        }
 
     #load credentials
     if ($env:UserName -eq $config.nlsvcintegritych) {
@@ -37,6 +37,11 @@ function Start-IntegrityCheckADGroups {
         $params = @{
             Path = "D:\Scripts\Creds\nlsvcintegritych.cred"}
             $hashadcheck = Import-Clixml @params
+    }
+    
+    else {
+        Write-Verbose "[$(Get-Date)] Wrong username"
+        break
     }
     
     #load modules
