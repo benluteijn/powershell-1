@@ -33,9 +33,8 @@ function Show-AvailableVDIs {
     if ($env:UserName -eq $config.nlsvcvmwa) {
         Write-Verbose "[$(Get-Date)] Loading credentials"
         $params = @{
-            Path = "D:\Scripts\Creds\nlsvcvmwa.cred"
-        }
-        $hashvm = Import-Clixml @params
+            Path = "D:\Scripts\Creds\nlsvcvmwa.cred"}
+            $hashvm = Import-Clixml @params
     }
     
     else {
@@ -73,10 +72,9 @@ function Show-AvailableVDIs {
             $get = @{
                 PoolName = $pool
                 State = 'AVAILABLE'}
-
-            $where = @{
-                Filterscript = {$_.namesdata.username -eq $null}
-            }
+                    $where = @{
+                        Filterscript = {$_.namesdata.username -eq $null}
+                    }
 
             foreach ($entry in $pool) {  
                 $summaryCount = @(Get-HVMachineSummary @get | 
