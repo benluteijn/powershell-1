@@ -77,7 +77,7 @@ function Show-OverviewVDIs {
                 $results = @()    
                     foreach ($vm in $vms) {
                         $vmssstemp = $vm.namesdata.username -replace 
-                        "nl.kworld.kpmg.com[\W]", "" 
+                        $config.fqdn, "" 
                         $vmsss = foreach ($entry in $vmssstemp) {
                         $params = @{
                             Filter = {sAMAccountName -eq $entry -and enabled -eq $true}}
@@ -95,7 +95,7 @@ function Show-OverviewVDIs {
                                     "AD - Desription" = $aduser.DESCRIPTION
                                     "AD - extensionattribute1" = $aduser.extensionattribute1
                                     "AD - extensionattribute9" = $aduser.extensionattribute9}
-                                    $results += new-object psobject -Property $properties
+                                        $results += new-object psobject -Property $properties
 
             }   
         }
