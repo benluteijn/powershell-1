@@ -53,7 +53,7 @@ function Show-AvailableVDIs {
         Write-Verbose "[$(Get-Date)] Connecting to HV server"
         foreach ($hvservers in $config.hvserver) {
             $params = @{
-                Server     = $hvservers
+                Server = $hvservers
                 Credential = $hashvm.svcvmwa}
                 Connect-HVServer @params >$null
         }
