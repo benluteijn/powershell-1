@@ -87,7 +87,7 @@ function Show-OverviewVDIs {
                                     "VDI - Name" = $vm.base.name
                                     "VDI - Poolname" = $vm.namesdata.desktopname
                                     "AD - User" = $vmsss
-                                    "AD - Desription" = $aduser.DESCRIPTION
+                                    "AD - Desription" = $aduser.description
                                     "AD - extensionattribute1" = $aduser.extensionattribute1
                                     "AD - extensionattribute9" = $aduser.extensionattribute9}
                                         $results += new-object psobject -Property $properties
