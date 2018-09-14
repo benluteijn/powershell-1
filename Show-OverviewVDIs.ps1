@@ -78,19 +78,20 @@ function Show-OverviewVDIs {
                             Filter = {sAMAccountName -eq $entry -and enabled -eq $true}}
                                 Get-Aduser @params | select -ExpandProperty name}
                                     
-            foreach ($user in $vmsss) {
-                $params = @{
-                Identity = $user
-                Properties = "Description", "Extensionattribute1", "Extensionattribute9"}
-                    $aduser = Get-ADUser @params                  
-                    $properties = [ordered]@{
-                        "VDI - Name" = $vm.base.name
-                        "VDI - Poolname" = $vm.namesdata.desktopname
-                        "AD - User" = $vmsss
-                        "AD - Desription" = $aduser.DESCRIPTION
-                        "AD - extensionattribute1" = $aduser.extensionattribute1
-                        "AD - extensionattribute9" = $aduser.extensionattribute9}
-                            $results += new-object psobject -Property $properties
+                                
+        foreach ($user in $vmsss) {
+            $params = @{
+            Identity = $user
+            Properties = "Description", "Extensionattribute1", "Extensionattribute9"}
+                $aduser = Get-ADUser @params                  
+                $properties = [ordered]@{
+                    "VDI - Name" = $vm.base.name
+                    "VDI - Poolname" = $vm.namesdata.desktopname
+                    "AD - User" = $vmsss
+                    "AD - Desription" = $aduser.DESCRIPTION
+                    "AD - extensionattribute1" = $aduser.extensionattribute1
+                    "AD - extensionattribute9" = $aduser.extensionattribute9}
+                        $results += new-object psobject -Property $properties
 
             }   
         }
