@@ -1,21 +1,16 @@
 <#
 .SYNOPSIS
-
+Shows active VDIs in VMWAre view
 
 .DESCRIPTION
-
+This function gets active VDIs in VMWAre view 
+together with AD attributes
 
 .EXAMPLE
 Show-OverviewVDIs -verbose
 
 .NOTES
-Function name:          Show-OverviewVDIs
-Author:                 Dennis Kool
-DateCreated:            31-08-2018
-DateModified:           31-08-2018
-
-.NOTES
-31-08-2018:             Initial release
+Author: Dennis Kool
 #>
 
 function Show-OverviewVDIs {
