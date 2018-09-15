@@ -75,14 +75,17 @@ function Show-OverviewVDIs {
                         $config.fqdn, "" 
                         $vmsss = foreach ($entry in $vmssstemp) {
                         $params = @{
-                            Filter = {sAMAccountName -eq $entry -and enabled -eq $true}}
-                                Get-Aduser @params | Select-Object -ExpandProperty name}
+                            Filter = {sAMAccountName -eq $entry -and
+                                    enabled -eq $true}}
+                                        Get-Aduser @params |
+                                        Select-Object -ExpandProperty name}
                                     
                                 
         foreach ($user in $vmsss) {
             $params = @{
             Identity = $user
-            Properties = "Description", "Extensionattribute1", "Extensionattribute9"}
+            Properties = "Description", "Extensionattribute1", 
+                        "Extensionattribute9"}
                 $aduser = Get-ADUser @params                  
                 $properties = [ordered]@{
                     "Name" = $vm.base.name
