@@ -36,7 +36,7 @@ function Show-DfsShares {
         $FolderList = foreach ($folder in $config.dfsfolderpaths) {
             $params = @{
                 Path = $folder}
-                get-dfsnfolder @params
+                Get-DfsnFolder @params
         }
          
         if ([string]::IsNullOrEmpty($DfsFolderTargets)) {
@@ -49,7 +49,7 @@ function Show-DfsShares {
         if ([string]::IsNullOrEmpty($DfsShares)) {
             $DfsShares = $DfsFolderTargets |
                 Select-Object Path, TargetPath | Sort-Object TargetPath
-                write-verbose ($DfsShares | Out-String)
+                Write-verbose ($DfsShares | Out-String)
         }
     }
 }
