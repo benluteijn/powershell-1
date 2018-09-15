@@ -76,7 +76,7 @@ function Show-OverviewVDIs {
                         $vmsss = foreach ($entry in $vmssstemp) {
                         $params = @{
                             Filter = {sAMAccountName -eq $entry -and enabled -eq $true}}
-                                Get-Aduser @params | select -ExpandProperty name}
+                                Get-Aduser @params | Select-Object -ExpandProperty name}
                                     
                                 
         foreach ($user in $vmsss) {
@@ -88,7 +88,7 @@ function Show-OverviewVDIs {
                     "Name" = $vm.base.name
                     "Poolname" = $vm.namesdata.desktopname
                     "User" = $vmsss
-                    "Desription" = $aduser.DESCRIPTION
+                    "Desription" = $aduser.description
                     "extensionattribute1" = $aduser.extensionattribute1
                     "extensionattribute9" = $aduser.extensionattribute9}
                         $results += new-object psobject -Property $properties
