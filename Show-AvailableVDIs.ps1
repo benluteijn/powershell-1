@@ -22,19 +22,19 @@ function Show-AvailableVDIs {
     #load static variables using json file
     if ([string]::IsNullOrEmpty($config)) {
         Write-Verbose "[$(Get-Date)] Loading JSON file"
-        $params = @{
-            Path = $configfile
-            Raw  = $true}
-            $config = Get-Content @params |
-            ConvertFrom-Json
+            $params = @{
+                Path = $configfile
+                Raw  = $true}
+                    $config = Get-Content @params | 
+                    ConvertFrom-Json
     }
 
     #load credentials
     if ($env:UserName -eq $config.nlsvcvmwa) {
         Write-Verbose "[$(Get-Date)] Loading credentials"
-        $params = @{
-            Path = "D:\Scripts\Creds\nlsvcvmwa.cred"}
-            $hashvm = Import-Clixml @params
+            $params = @{
+                Path = "D:\Scripts\Creds\nlsvcvmwa.cred"}
+                    $hashvm = Import-Clixml @params
     }
     
     else {
@@ -45,17 +45,17 @@ function Show-AvailableVDIs {
     #load module
     if (!(Get-Module VMware.Hv.Helper)) {
         Write-Verbose "[$(Get-Date)] Loading VMware HV Helper module"
-        Import-Module VMware.Hv.Helper
+            Import-Module VMware.Hv.Helper
     }
   
     #connect to VMWare view environments
     if (!($Global:DefaultHVServers)) {
         Write-Verbose "[$(Get-Date)] Connecting to HV server"
-        foreach ($hvservers in $config.hvserver) {
-            $params = @{
-                Server = $hvservers
-                Credential = $hashvm.svcvmwa}
-                Connect-HVServer @params >$null
+            foreach ($hvservers in $config.hvserver) {
+                $params = @{
+                    Server = $hvservers
+                    Credential = $hashvm.svcvmwa}
+                    Connect-HVServer @params >$null
         }
     } 
     
@@ -67,20 +67,19 @@ function Show-AvailableVDIs {
     #extracting VDI's from VMWare view
     if ([string]::IsNullOrEmpty($pools)) {
         Write-Verbose "[$(Get-Date)] Generating output available VDI's per pool"
-        $pools = $config.pools
-        foreach ($pool in $pools) {
-            $get = @{
-                PoolName = $pool
-                State = 'AVAILABLE'}
-                    $where = @{
-                        Filterscript = {$_.namesdata.username -eq $null}
+            $pools = $config.pools
+                foreach ($pool in $pools) {
+                    $get = @{
+                        PoolName = $pool
+                        State = 'AVAILABLE'}
+                            $where = @{
+                                Filterscript = {$_.namesdata.username -eq $null}
                     }
 
             foreach ($entry in $pool) {  
-                $summaryCount = @(Get-HVMachineSummary @get | 
-                Where-Object @where).Count  
-                #composite format strings
-                Write-Verbose ('{0} available VDIs left at pool {1}' -f $summaryCount, $entry)
+                    $summaryCount = @(Get-HVMachineSummary @get | 
+                        Where-Object @where).Count
+                            Write-Verbose ('{0} available VDIs left at pool {1}' -f $summaryCount, $entry)
             }
         }
     }
